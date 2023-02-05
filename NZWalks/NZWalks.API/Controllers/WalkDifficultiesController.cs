@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Repositories;
 
@@ -6,6 +7,7 @@ namespace NZWalks.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class WalkDifficultiesController : Controller
     {
         private readonly IWalkDifficultyRepository _repository;
@@ -18,6 +20,7 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "reader")]
         public async Task<IActionResult> GetAllWalkDifficulties()
         {
             var walkDifficulties = await _repository.GetAllSync();
@@ -29,6 +32,7 @@ namespace NZWalks.API.Controllers
         [HttpGet]
         [Route("{id:guid}")]
         [ActionName("GetWalkDifficulty")]
+        [Authorize(Roles = "reader")]
         public async Task<IActionResult> GetWalkDifficulty([FromRoute] Guid id)
         {
             var walkDifficulty = await _repository.GetAsync(id);
@@ -43,13 +47,14 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> AddWalkDifficulty(Models.DTO.AddWalkDifficultyRequest addWalkDifficultyRequest)
         {
             //Validate request body
-            if(!_ValidateAddWalkDifficulty(addWalkDifficultyRequest))
-            {
-                return BadRequest(ModelState);
-            }
+            //if(!_ValidateAddWalkDifficulty(addWalkDifficultyRequest))
+            //{
+            //    return BadRequest(ModelState);
+            //}
 
             var walkDifficulty = new Models.Domain.WalkDifficulty()
             {
@@ -64,13 +69,14 @@ namespace NZWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> UpdateWalkDifficulty([FromRoute] Guid id, [FromBody] Models.DTO.UpdateWalkDifficultyRequest updateWalkDifficultyRequest)
         {
             //Validate request body
-            if(!_ValidateUpdateWalkDifficulty(updateWalkDifficultyRequest))
-            {
-                return BadRequest(ModelState);
-            }
+            //if(!_ValidateUpdateWalkDifficulty(updateWalkDifficultyRequest))
+            //{
+            //    return BadRequest(ModelState);
+            //}
 
             var walkDifficulty = await _repository.UpdateAsync(id, new Models.Domain.WalkDifficulty() { Code = updateWalkDifficultyRequest.Code });
 
@@ -82,6 +88,7 @@ namespace NZWalks.API.Controllers
 
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> DeleteWalkDifficuly([FromRoute] Guid id)
         {
             var walkDifficulty = await _repository.DeleteAsync(id);

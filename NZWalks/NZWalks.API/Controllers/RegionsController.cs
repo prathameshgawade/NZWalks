@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Repositories;
 
@@ -6,6 +7,7 @@ namespace NZWalks.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class RegionsController : Controller
     {
         private readonly IRegionRepository _regionRepository;
@@ -18,6 +20,7 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "reader")]
         public async Task<IActionResult> GetAllRegions()
         {
             var regions = await this._regionRepository.GetAllAsync();
@@ -47,6 +50,7 @@ namespace NZWalks.API.Controllers
         [HttpGet]
         [Route("{id:guid}")]
         [ActionName("GetRegion")]
+        [Authorize(Roles = "reader")]
         public async Task<IActionResult> GetRegion(Guid id)
         {
             var region = await this._regionRepository.GetAsync(id);
@@ -61,13 +65,14 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> AddRegion(Models.DTO.AddRegionRequest addRegionRequest)
         {
             // Validate request body
-            if(!_ValidateAddRegionRequest(addRegionRequest))
-            {
-                return BadRequest(ModelState);
-            }
+            //if(!_ValidateAddRegionRequest(addRegionRequest))
+            //{
+            //    return BadRequest(ModelState);
+            //}
 
             // Convert request DTO to domain model
             var region = new Models.Domain.Region()
@@ -100,6 +105,7 @@ namespace NZWalks.API.Controllers
 
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> DeleteRegion(Guid id)
         {
             var region = await _regionRepository.DeleteAsync(id);
@@ -114,13 +120,14 @@ namespace NZWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> UpdateRegion([FromRoute] Guid id, [FromBody] Models.DTO.UpdateRegionRequest updateRegionRequest)
         {
             //Validate request body
-            if(!_ValidateUpdateRegionRequest(updateRegionRequest))
-            {
-                return BadRequest(ModelState);
-            }
+            //if(!_ValidateUpdateRegionRequest(updateRegionRequest))
+            //{
+            //    return BadRequest(ModelState);
+            //}
 
             // Convert DTO to domain model
             var region = new Models.Domain.Region()
